@@ -25,11 +25,11 @@ def generate_html(path_to_data):
                       "<title>Визуализация результатов</title>", "</head>", "<body>",
                       "<table cellspacing='0' cellpadding='5'>"]) + "\n"
     paths_to_imgs = sorted(
-        ["/".join(path.split("/")[-2:]) for path in glob(f"{path_to_data}/*_img.jpg")])
+        ["/".join(path.split("/")[-2:]) for path in glob_win_hack(f"{path_to_data}/*_img.jpg")])
     paths_to_masks = sorted(
-        ["/".join(path.split("/")[-2:]) for path in glob(f"{path_to_data}/*_pred_mask.png")])
+        ["/".join(path.split("/")[-2:]) for path in glob_win_hack(f"{path_to_data}/*_pred_mask.png")])
     paths_to_crops = sorted(
-        ["/".join(path.split("/")[-2:]) for path in glob(f"{path_to_data}/*_crop.png")])
+        ["/".join(path.split("/")[-2:]) for path in glob_win_hack(f"{path_to_data}/*_crop.png")])
     for ind, (path_to_img, path_to_mask, path_to_crop) in enumerate(zip(paths_to_imgs,
                                                                         paths_to_masks,
                                                                         paths_to_crops)):
@@ -99,3 +99,8 @@ def get_html(paths_to_imgs, pred_masks, path_to_save="results/test"):
     html = generate_html(path_to_save)
 
     return html
+
+
+def glob_win_hack(*args, **kwargs):
+    return [i.replace('\\', '/') for i in glob(*args, *kwargs)]
+

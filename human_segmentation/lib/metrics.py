@@ -1,4 +1,7 @@
+import tensorflow as tf
 import numpy as np
+
+from tensorflow.python.keras import losses
 
 
 EPS = 1e-10
@@ -58,7 +61,7 @@ def get_dice(true, pred):
     -----
     Masks should contains only 2 unique values, one of them must be 0, another value, that denotes
     object, could be different from 1 (for example 255).
-    
+
     """
     assert type(true) == type(pred), "Types of true and pred should be the same."
     if isinstance(true, list):
@@ -67,3 +70,24 @@ def get_dice(true, pred):
         return dice(true, pred)
     else:
         raise TypeError("Wrong type.")
+
+
+def dice_coeff(y_true, y_pred):
+    # Flatten
+    y_true_f = tf.reshape(y_true, [-1])
+    y_pred_f = tf.reshape(y_pred, [-1])
+    intersection = tf.reduce_sum(y_true_f * y_pred_f)
+    area_true_y = tf.reduce_sum(y_true_f)
+    area_pred_y = tf.reduce_sum(y_pred_f)
+    score = (2. * intersection + EPS) / (area_true_y + area_pred_y + EPS)
+    return score
+
+
+def dice_loss(y_true, y_pred):
+    loss = 1 - dice_coeff(y_true, y_pred)
+    return loss
+
+
+def bce_dice_loss(y_true, y_pred):
+    loss = losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
+    return loss
